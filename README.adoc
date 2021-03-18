@@ -1,0 +1,128 @@
+= Automatically creating GitHub issues from Google Forms
+
+== Purpose
+
+On occasion one may want to use Google Forms to act as a private
+conduit to send issues to a private GitHub repository.
+
+For example, user feedback or security reporting could be managed
+using a private GitHub repository, with the frontend being a
+Google Form.
+
+This repository contains a Google Apps Script (and associated files)
+that you can use to easily set this flow up.
+
+With a Google Form for feedback you could also embed the Form on
+your website,
+
+
+== Examples
+
+* https://www.rnpgp.org/feedback
+* https://isotc211.geolexica.org/feedback
+
+
+== What you need
+
+* A Google Form
+* A GitHub Personal Account Token ("`PAT`") that has access rights
+  to read and write `repos` (you set this on token creation)
+* A GitHub repository (private or public)
+
+
+== What to do
+
+=== Create a Google Form
+
+Go to https://drive.google.com with your Google account, and create
+a new "Google Form".
+
+=== Create an Apps Script
+
+Click on the "..." button at the top right corner of the Form to
+open the menu, and click on "`Script Editor`" to open the
+Google Apps Script interface.
+
+=== Enable manual permissions management
+
+In the Apps Script editor, click on the "gear" icon in the left
+navigation bar.
+
+Enable the option for "`Show "appsscript.json" manifest file in editor`".
+This is necessary to enable application components the actual script requires.
+
+=== Update `appsscript.json`
+
+Then go back to the code editor and click on `appsscript.json` which
+is now present. Paste in the code from this repo's `source/appsscript.json`.
+
+In `appsscript.json`, ensure the following two entries must be present under
+the `oauthScopes` key to enable the use of the `FormApp` and `UrlFetchApp`
+modules:
+
+[source,json]
+----
+"oauthScopes": [
+  "https://www.googleapis.com/auth/forms",
+  "https://www.googleapis.com/auth/script.external_request"
+]
+----
+
+
+=== Add Code.gs
+
+By default, Apps Script provides you with a `Code.gs` file to enter code.
+
+Paste in the code from this repo's `source/Code.gs`.
+
+You will want to make the following changes:
+
+* Change the value of `var ghToken = "DEADBEEFDEADBEEFDEADBEEFDEADBEEF"` to your GitHub account PAT.
+
+This script is designed to provide you all response values of the form
+in a certain presentation in Markdown syntax. Feel free to change things around.
+
+
+=== Setup Trigger to Form
+
+Click on the "`clock`" icon in the left navigation ("Triggers") to
+enter the Triggers page.
+
+Click the "`Add Trigger`" button at the bottom right corner.
+
+In the form, enter the following:
+
+Choose which function to run:: onSubmit
+Choose which deployment should run:: Head
+Select event source:: From form
+Select event type:: On form submit
+
+
+=== Iterate and debug
+
+Now go to your actual Google Form (click on "Preview" to see the entry page)
+and start trying out.
+
+After filling in the form, go to the Apps Script editor and click
+in the left navigation the "list" icon for "Executions".
+
+The Executions page displays all invocations of the function, and you should
+be able to see your most recent invocation when the form was submitted.
+There is a general lag of maybe one or two dozen seconds, but it shows up
+pretty fast without refreshing.
+
+If you want to print debug statements, use `console.log('foo bar')`.
+You could also change `Logger.log` to `console.log` to see console print
+outs in individual invocations on this page.
+
+
+=== Done!
+
+When you are greeted by a newly submitted GitHub issue that was created
+by the form, rejoice!
+
+
+== Copyright
+
+Licensed under 2-clause BSD.
+
